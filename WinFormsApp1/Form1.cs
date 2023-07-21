@@ -93,6 +93,44 @@ namespace WinFormsApp1
             label1.Text = "I—¹\n";
         }
 
+        private void train()
+        {
+            string format = "yyyyMM";
+
+            DateTime startDate = new DateTime(2017, 1, 1);
+            DateTime endDate = new DateTime(2022, 12, 1);
+
+            DateTime currentDate = startDate;
+
+            List<Single> peres = new List<Single>();
+
+            while (currentDate <= endDate)
+            {
+                string folderName = currentDate.ToString(format) + ".bin";
+
+
+                Debug.WriteLine(folderName);
+
+                List<Single> er = ListConversion.LoadListFromSingleFile(folderName);
+
+                foreach (Single s in er)
+                    peres.Add(s);
+
+                //Ÿ‚ÌŒ‚Éi‚Ş
+                currentDate = currentDate.AddMonths(1);
+            }
+            Thread thread = new Thread(new ThreadStart(() =>
+            {
+                LSTM.Run(peres);
+            }));
+            thread.Start();
+            label1.Text = "";
+            label1.Text += "‰ğÍ’†\n";
+            thread.Join();
+            label1.Text = "";
+            label1.Text += "‰ğÍI—¹";
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             Form5 f5 = new Form5();
