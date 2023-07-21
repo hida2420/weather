@@ -18,91 +18,9 @@ namespace WinFormsApp1
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            using (OpenFileDialog openFileDialog1 = new OpenFileDialog())
-            {
-                if (openFileDialog1.ShowDialog() == DialogResult.OK)
-                {
-                    //textBox1.Text = openFileDialog1.FileName;
-                }
-            }
-            Form2 f2 = new Form2();
-            f2.Show();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            MLModel1.ModelOutput result = new MLModel1.ModelOutput();
-
-            Thread thread = new Thread(new ThreadStart(() =>
-            {
-                result = this.check();
-            }));
-            thread.Start();
-            label1.Text = "";
-
-            label1.Text += "解析中なう\n";
-            thread.Join();
-
-
-
-            label1.Text = "";
-            label1.Text += "その画像は。。。\n";
-
-            DataViewSchema.Column? col = MLModel1.PredictEngine.Value.OutputSchema.GetColumnOrNull("Score");
-            VBuffer<ReadOnlyMemory<char>> value = default;
-            col.Value.Annotations.GetValue("TrainingLabelValues", ref value);
-
-            label1.Text += (result.Score[0] * 100) + "％\nの確率であってるわ\n";
-
-            if (result.Score[0] >= 0.5)
-            {
-                label1.Text += "多分あってるわ。";
-            }
-            else
-            {
-                label1.Text += "多分あってない";
-            }
-
-            //Load sample data
-            /*MLModel1.ModelInput sampleData = new MLModel1.ModelInput()
-            {
-                ImageSource = textBox1.Text,
-            };
-
-            //Load model and predict output
-            var result = MLModel1.Predict(sampleData);
-
-            //label1.Text += String.Format("この画像は : {0} / スコア: {1:f} \r\n", result.PredictedLabel, result.Score.Max());
-
-            DataViewSchema.Column? col = MLModel1.PredictEngine.Value.OutputSchema.GetColumnOrNull("Score");
-            VBuffer<ReadOnlyMemory<char>> value = default;
-            col.Value.Annotations.GetValue("TrainingLabelValues", ref value);
-
-
-            label1.Text += "スコア\r\n";
-            for (int i = 0; i < result.Score.Length; i++)
-            {
-                label1.Text += String.Format("Label : {0}  Score : {1:f}\r\n", value.GetItemOrDefault(i).ToString(), result.Score[i]);
-            }*/
-
-        }
-
-        private MLModel1.ModelOutput check()
-        {
-            //Load sample data
-            var sampleData = new MLModel1.ModelInput()
-            {
-                //ImageSource = textBox1.Text,
-            };
-            //Load model and predict output
-            return MLModel1.Predict(sampleData);
-        }
-
+        //画像処理
         private void button4_Click_1(object sender, EventArgs e)
         {
-            //Bitmap image = new Bitmap("201902020000.vis.01.fld.geoss.png");
             int x = 800;    // 左上隅のx座標
             int y = 300;    // 左上隅のy座標
             int width = 1085 - 800;    // 切り取る領域の幅
@@ -116,8 +34,8 @@ namespace WinFormsApp1
                 string baseDirectory = "VIS01";
                 string format = "yyyyMM";
 
-                DateTime startDate = new DateTime(2019, 9, 1);
-                DateTime endDate = new DateTime(2023, 3, 1);
+                DateTime startDate = new DateTime(2023, 1, 1);
+                DateTime endDate = new DateTime(2023, 6, 1);
 
                 DateTime currentDate = startDate;
 
@@ -131,11 +49,12 @@ namespace WinFormsApp1
 
                     if (Directory.Exists(folderPath))
                     {
+                        //一か月分の画像を読み込み
                         List<Bitmap> images = ImageProcessing.LoadImagesFromDirectory(folderPath);
 
-                        //読み込まれた画像の数を表示
                         Debug.WriteLine($"読み込まれた画像の数 ({folderName}): {images.Count}");
 
+                        //雲の割合を算出し、binファイルに保存する
                         List<double> cloudPerMonth = new List<double>();
                         foreach (Bitmap img in images)
                         {
@@ -144,11 +63,7 @@ namespace WinFormsApp1
                             cloudPerMonth.Add(cloudPercentage);
                             string filePath = "list_data.bin";
                             ListConversion.SaveDoubleListAsSingleFile(cloudPercentages, filePath);
-                            //List<System.Single> percentages = ListConversion.LoadListFromSingleFile(filePath);
-                            //Debug.WriteLine("----------------------");
-                            //foreach (System.Single p in percentages)
-                            //    Debug.WriteLine(p);
-                            //Debug.WriteLine("----------------------");
+
                         }
                         ListConversion.SaveDoubleListAsSingleFile(cloudPerMonth, currentDate.ToString(format)+".bin");
 
@@ -163,57 +78,29 @@ namespace WinFormsApp1
                     }
                 }
 
+                //最終的な保存
                 string filePath2 = "list_data.bin";
-
-                //VIS01\201802\まで保存した
                 ListConversion.SaveDoubleListAsSingleFile(cloudPercentages, filePath2);
                 List<System.Single> percentages2 = ListConversion.LoadListFromSingleFile(filePath2);
 
                 Debug.WriteLine("解析が終わりました。");
-                foreach (System.Single cp in percentages2)
-                    Debug.WriteLine(cp);
-
 
             }));
             thread.Start();
             label1.Text = "";
-            label1.Text += "解析中なう\n";
+            label1.Text += "雲の割合算出中...\n";
             thread.Join();
-            label1.Text = "解析終了\n";
-            //label1.Text += "雲の割合は\n" + zeroPercentage + "%\nだったぜ";
+            label1.Text = "終了\n";
         }
 
-        private void button2_Click_1(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
-            /*string filePath = "list_data.bin";
-            List<System.Single> percentages = ListConversion.LoadListFromSingleFile(filePath);
-
-            Thread thread = new Thread(new ThreadStart(() =>
-            {
-                Sample08.RunPredict(percentages);
-                //Sample08.RunPredict(percentages, percentages[0], percentages[1], percentages[2]);
-            }));
-            thread.Start();
-            label1.Text = "";
-            label1.Text += "解析中なう\n";
-            thread.Join();
-            label1.Text = "";
-            label1.Text += "解析終了";
-            */
-
             Form5 f5 = new Form5();
             f5.Show();
-
         }
 
-        private void Button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
-            
-        }
-
-        private void button1_Click_1(object sender, EventArgs e)
-        {
-            
             Form2 f2 = new Form2();
             f2.Show();
         }

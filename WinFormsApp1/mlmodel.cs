@@ -45,6 +45,9 @@ namespace WinFormsApp1
             [ColumnName(@"col9")]
             public float Col9 { get; set; }
 
+            [ColumnName(@"col10")]
+            public float Col10 { get; set; }
+
         }
 
         #endregion

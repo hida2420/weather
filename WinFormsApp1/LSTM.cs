@@ -28,23 +28,22 @@ namespace WinFormsApp1
         const int LENGTH_OF_SEQUENCE = 100;
 
         const int DISPLAY_EPOCH = 1;
-        //予測時出力されるリストの長さ
-        //一ヶ月分は194
-        const int PREDICTION_LENGTH = 31;
 
-        public static Double[] RunPredict(List<Real> input)
+        //予測を行う
+        public static Double[] RunPredict(List<Real> input, int length)
         {
             DataMaker dataMaker = new DataMaker(STEPS_PER_CYCLE, NUMBER_OF_CYCLES);
 
             //学習の終わったネットワークを読み込み
-            FunctionStack<Real> model_saved = (FunctionStack<float>)ModelIO<Real>.Load("時系列で予測.nn");
+            FunctionStack<Real> model_saved = (FunctionStack<float>)ModelIO<Real>.Load("予測.nn");
 
             Debug.WriteLine("予測中...");
-            NdArray<Real>[] testSequences = dataMaker.MakePredictData(0, input);
+            NdArray<Real>[] testSequences = dataMaker.MakePredictData(0, input, length);
 
-            return predict(testSequences[0], model_saved, PREDICTION_LENGTH);
+            return predict(testSequences[0], model_saved, length);
         }
 
+        //トレーニングを行う
         public static void Run(List<Real> input)
         {
             DataMaker dataMaker = new DataMaker(STEPS_PER_CYCLE, NUMBER_OF_CYCLES);
@@ -81,20 +80,14 @@ namespace WinFormsApp1
                 if (epoch != 0 && epoch % DISPLAY_EPOCH == 0)
                 {
                     Debug.WriteLine("[{0}]training loss:\t{1}", epoch, loss);
+                    ModelIO<Real>.Save(model, "予測.nn");
+                    if (loss < 180)
+                        break;
                 }
             }
 
             //学習の終わったネットワークを保存
-            ModelIO<Real>.Save(model, "時系列で予測.nn");
-
-            //学習の終わったネットワークを読み込み
-            FunctionStack<Real> model_saved = (FunctionStack<float>)ModelIO<Real>.Load("時系列で予測.nn");
-
-            Debug.WriteLine("Testing...");
-            NdArray<Real>[] testSequences = dataMaker.MakeMiniBatch(trainData, MINI_BATCH_SIZE, LENGTH_OF_SEQUENCE);
-
-            int sample_index = 45;
-            predict(testSequences[sample_index], model_saved, PREDICTION_LENGTH);
+            ModelIO<Real>.Save(model, "予測.nn");
         }
 
         static Real ComputeLoss(FunctionStack<Real> model, NdArray<Real>[] sequences)
@@ -189,11 +182,6 @@ namespace WinFormsApp1
                 this.numberOfCycles = numberOfCycles;
             }
 
-            public DataMaker()
-            {
-
-            }
-
             public NdArray<Real> Make()
             {
                 NdArray<Real> result = new NdArray<Real>(this.stepsPerCycle * this.numberOfCycles);
@@ -242,13 +230,13 @@ namespace WinFormsApp1
 
             //予測用データの作成
             //startIndex:予測に用いる一ヶ月分のデータを取り出し始める位置
-            public NdArray<Real>[] MakePredictData(int startIndex, List<Real> input)
+            public NdArray<Real>[] MakePredictData(int startIndex, List<Real> input, int length)
             {
                 NdArray<Real>[] result = new NdArray<Real>[1];
-                result[0] = new NdArray<Real>(PREDICTION_LENGTH);
+                result[0] = new NdArray<Real>(length);
                 Debug.WriteLine(input.Count);
 
-                for(int i = startIndex; i < PREDICTION_LENGTH; i++)
+                for(int i = startIndex; i < length; i++)
                     result[0].Data[i] = input[i];
 
                 return result;
