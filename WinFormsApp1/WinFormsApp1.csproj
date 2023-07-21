@@ -5,7 +5,14 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <PackageIcon>bandicam 2023-04-24 20-42-59-298.png</PackageIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\Downloads\bandicam 2023-04-24 20-42-59-298.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="LiveCharts.WinForms" Version="0.9.7.1" />
     <PackageReference Include="MetroModernUI" Version="1.4.0" />
