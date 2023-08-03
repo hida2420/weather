@@ -1,4 +1,4 @@
-﻿using ScottPlot;
+using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -104,16 +104,23 @@ namespace WinFormsApp1
             };
 
             List<System.Single> percentages = ListConversion.LoadListFromSingleFile(fileNames[metroComboBox1.SelectedIndex]);
-            Double[] pred = new Double[percentages.Count];
-            Double[] date = new Double[percentages.Count];
-            for (int i = 1; i <= percentages.Count; i++)
+            List<Single> answer = ListConversion.LoadListFromSingleFile(fileNames[metroComboBox1.SelectedIndex+1]);
+            int maax = Math.Min(answer.Count, percentages.Count);
+            Double[] ans = new Double[maax];
+            Double[] pred = new Double[maax];
+            Double[] date = new Double[maax];
+            for (int i = 0; i < maax; i++)
+                ans[i] = answer[i];
+            for (int i = 1; i <= maax; i++)
                 date[i - 1] = i;
             Debug.WriteLine("test");
-            pred = LSTM.RunPredict(percentages, percentages.Count);
+            pred = LSTM.RunPredict(percentages, maax);
 
             Debug.WriteLine("x:" + pred.Length + ", " + date.Length);
             formsPlot1.plt.Clear();
-            formsPlot1.Plot.AddScatter(date, pred);
+            formsPlot1.Plot.AddScatter(date, pred, label:"予測データ");
+            formsPlot1.Plot.AddScatter(date, ans, label:"正解データ");
+            formsPlot1.plt.Title("予測データと正解データの比較(" + metroComboBox1.SelectedItem + "の翌月)");
             formsPlot1.plt.XLabel("日付");
             formsPlot1.plt.YLabel("雲量の割合(%)");
             formsPlot1.plt.Legend();
