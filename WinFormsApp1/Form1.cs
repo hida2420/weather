@@ -18,13 +18,13 @@ namespace WinFormsApp1
             InitializeComponent();
         }
 
-        //‰æ‘œˆ—
+        //é›²ã®å‰²åˆã‚’ç®—å‡ºã—ã€ãƒã‚¤ãƒŠãƒªãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜(é–‹ç™ºç”¨é–¢æ•°)
         private void button4_Click_1(object sender, EventArgs e)
         {
-            int x = 800;    // ¶ã‹÷‚ÌxÀ•W
-            int y = 300;    // ¶ã‹÷‚ÌyÀ•W
-            int width = 1085 - 800;    // Ø‚èæ‚é—Ìˆæ‚Ì•
-            int height = 527 - 300;   // Ø‚èæ‚é—Ìˆæ‚Ì‚‚³
+            int x = 800;    // å·¦ä¸Šéš…ã®xåº§æ¨™
+            int y = 300;    // å·¦ä¸Šéš…ã®yåº§æ¨™
+            int width = 1085 - 800;    // åˆ‡ã‚Šå–ã‚‹é ˜åŸŸã®å¹…
+            int height = 527 - 300;   // åˆ‡ã‚Šå–ã‚‹é ˜åŸŸã®é«˜ã•
 
             List<double> cloudPercentages = new List<double>();
             List<Bitmap> images = new List<Bitmap>();
@@ -49,12 +49,12 @@ namespace WinFormsApp1
 
                     if (Directory.Exists(folderPath))
                     {
-                        //ˆê‚©Œ•ª‚Ì‰æ‘œ‚ğ“Ç‚İ‚İ
+                        //ä¸€ã‹æœˆåˆ†ã®ç”»åƒã‚’èª­ã¿è¾¼ã¿
                         List<Bitmap> images = ImageProcessing.LoadImagesFromDirectory(folderPath);
 
-                        Debug.WriteLine($"“Ç‚İ‚Ü‚ê‚½‰æ‘œ‚Ì” ({folderName}): {images.Count}");
+                        Debug.WriteLine($"èª­ã¿è¾¼ã¾ã‚ŒãŸç”»åƒã®æ•° ({folderName}): {images.Count}");
 
-                        //‰_‚ÌŠ„‡‚ğZo‚µAbinƒtƒ@ƒCƒ‹‚É•Û‘¶‚·‚é
+                        //é›²ã®å‰²åˆã‚’ç®—å‡ºã—ã€binãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜ã™ã‚‹
                         List<double> cloudPerMonth = new List<double>();
                         foreach (Bitmap img in images)
                         {
@@ -67,32 +67,33 @@ namespace WinFormsApp1
                         }
                         ListConversion.SaveDoubleListAsSingleFile(cloudPerMonth, currentDate.ToString(format)+".bin");
 
-                        //Ÿ‚ÌŒ‚Éi‚Ş
+                        //æ¬¡ã®æœˆã«é€²ã‚€
                         currentDate = currentDate.AddMonths(1);
                     }
                     else
                     {
-                        //ƒtƒHƒ‹ƒ_‚ª‘¶İ‚µ‚È‚¢ê‡‚ÍƒXƒLƒbƒv‚µ‚ÄŸ‚ÌŒ‚Éi‚Ş
+                        //ãƒ•ã‚©ãƒ«ãƒ€ãŒå­˜åœ¨ã—ãªã„å ´åˆã¯ã‚¹ã‚­ãƒƒãƒ—ã—ã¦æ¬¡ã®æœˆã«é€²ã‚€
                         currentDate = currentDate.AddMonths(1);
                         continue;
                     }
                 }
 
-                //ÅI“I‚È•Û‘¶
+                //æœ€çµ‚çš„ãªä¿å­˜
                 string filePath2 = "list_data.bin";
                 ListConversion.SaveDoubleListAsSingleFile(cloudPercentages, filePath2);
                 List<System.Single> percentages2 = ListConversion.LoadListFromSingleFile(filePath2);
 
-                Debug.WriteLine("‰ğÍ‚ªI‚í‚è‚Ü‚µ‚½B");
+                Debug.WriteLine("è§£æãŒçµ‚ã‚ã‚Šã¾ã—ãŸã€‚");
 
             }));
             thread.Start();
             label1.Text = "";
-            label1.Text += "‰_‚ÌŠ„‡Zo’†...\n";
+            label1.Text += "é›²ã®å‰²åˆç®—å‡ºä¸­...\n";
             thread.Join();
-            label1.Text = "I—¹\n";
+            label1.Text = "çµ‚äº†\n";
         }
 
+        //é›²ã®å‰²åˆã®äºˆæ¸¬ã‚’ã™ã‚‹æ©Ÿæ¢°å­¦ç¿’ãƒ¢ãƒ‡ãƒ«ã®è¨“ç·´ã‚’è¡Œã†(é–‹ç™ºç”¨é–¢æ•°)
         private void train()
         {
             string format = "yyyyMM";
@@ -116,7 +117,7 @@ namespace WinFormsApp1
                 foreach (Single s in er)
                     peres.Add(s);
 
-                //Ÿ‚ÌŒ‚Éi‚Ş
+                //æ¬¡ã®æœˆã«é€²ã‚€
                 currentDate = currentDate.AddMonths(1);
             }
             Thread thread = new Thread(new ThreadStart(() =>
@@ -125,10 +126,10 @@ namespace WinFormsApp1
             }));
             thread.Start();
             label1.Text = "";
-            label1.Text += "‰ğÍ’†\n";
+            label1.Text += "è§£æä¸­\n";
             thread.Join();
             label1.Text = "";
-            label1.Text += "‰ğÍI—¹";
+            label1.Text += "è§£æçµ‚äº†";
         }
 
         private void button2_Click(object sender, EventArgs e)
